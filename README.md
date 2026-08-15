@@ -34,6 +34,7 @@ git clone https://github.com/aliecommerce123-web/golf-search.git
 cd golf-search
 
 python3 -m venv .venv
+.venv/bin/pip install --upgrade pip
 .venv/bin/pip install -r requirements.txt
 
 # Browser für das Scraping installieren (Pflicht, siehe unten)

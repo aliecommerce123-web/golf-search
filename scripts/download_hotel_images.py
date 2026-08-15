@@ -11,7 +11,7 @@ from collections import defaultdict
 import httpx
 from PIL import Image
 
-BASE = "/mnt/HC_Volume_104744115/golf-search"
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_DIR = os.path.join(BASE, "static", "hotel-images")
 MANIFEST = os.path.join(BASE, "data", "hotel_images.json")
 BOOTSTRAP = "https://golfbelek.com/gp/server/api/bootstrap.php"
