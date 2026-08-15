@@ -1,0 +1,17 @@
+[Unit]
+Description=Belek Golf Search (FastAPI proxy + inquiry capture)
+After=network.target
+
+[Service]
+Type=simple
+User=DEIN_USER
+Group=DEIN_USER
+WorkingDirectory=/PFAD/ZUM/PROJEKT
+ExecStart=/PFAD/ZUM/PROJEKT/.venv/bin/uvicorn app:app --host 0.0.0.0 --port 8917 --workers 2 --log-level info
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
