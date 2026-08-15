@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Belek Golf Collection · Premium Golf Holidays on the Turkish Riviera</title>
+<meta name="description" content="Hand-picked 5-star golf resorts in Belek. Live prices, green fees and airport transfers included. Reply within 10 to 30 minutes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="/static/style.css?v={{ asset_v }}">
+</head>
+<body data-default-date="{{ default_date }}">
+
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="brand" href="/">
+      <span class="brand-mark">BELEK</span>
+      <span class="brand-sub">Golf&nbsp;Collection</span>
+    </a>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ STEP 1 - HOTEL SELECTION ============ -->
+  <section class="view is-active" id="view-1">
+    <div class="hero wrap">
+      <p class="eyebrow">Turkish Riviera · Belek</p>
+      <h1 class="hero-title">Choose your resort.</h1>
+      <p class="hero-lead">
+        Eighteen hand-picked 5-star properties right by the region's best golf courses.
+        Swipe through the photos, pick your hotel, and we'll load the current package prices for you.
+      </p>
+    </div>
+
+    <div class="wrap">
+      <div class="hotel-grid" id="hotelGrid">
+        {% for h in hotels %}
+        <article class="hcard" data-oid="{{ h.oid }}">
+          <div class="gal" data-oid="{{ h.oid }}">
+            <div class="gal-track" tabindex="0" aria-label="Photos of {{ h.name }}">
+              {% if h.images %}
+                {% for img in h.images %}
+                <img src="{{ img }}" alt="{{ h.name }}, impression {{ loop.index }}"
+                     loading="{% if loop.first %}eager{% else %}lazy{% endif %}" decoding="async" draggable="false">
+                {% endfor %}
+              {% else %}
+                <div class="gal-empty">Photos coming soon</div>
+              {% endif %}
+            </div>
+            {% if h.images and h.images|length > 1 %}
+            <button class="gal-nav prev" type="button" aria-label="Previous image">&#8249;</button>
+            <button class="gal-nav next" type="button" aria-label="Next image">&#8250;</button>
+            <div class="gal-dots" aria-hidden="true"></div>
+            {% endif %}
+            <span class="gal-count">{{ h.images|length }} photos</span>
+          </div>
+
+          <div class="hcard-body">
+            <div class="hcard-stars" aria-label="{{ h.stars }} stars">
+              {% for s in range(h.stars) %}&#9733;{% endfor %}
+            </div>
+            <h2 class="hcard-name">{{ h.name }}</h2>
+            <p class="hcard-meta">Belek, Antalya · Green fees and airport transfers in the package</p>
+            <button class="btn btn-pick" type="button" data-pick="{{ h.oid }}">Choose this resort</button>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 2 - TRAVEL DATES ============ -->
+  <section class="view" id="view-2">
+    <div class="wrap narrow">
+      <button class="back" type="button" data-go="1">&#8249; Different resort</button>
+
+      <div class="selhotel" id="selHotel"></div>
+
+      <div class="panel">
+        <h2 class="panel-title">Your travel dates</h2>
+        <p class="panel-sub">Tell us when and how long, and we'll load the current prices. Flights stay out of scope; we plan the airport transfer into the package.</p>
+
+        <div class="form-grid">
+          <label class="field">
+            <span class="field-label">Check-in</span>
+            <input type="text" id="fDate" class="input" placeholder="Pick a date" readonly>
+          </label>
+          <label class="field">
+            <span class="field-label">Nights</span>
+            <select id="fNights" class="input"><option value="">Pick a date first</option></select>
+          </label>
+          <label class="field">
+            <span class="field-label">Golf rounds</span>
+            <select id="fRounds" class="input"><option value="">Pick a date first</option></select>
+          </label>
+        </div>
+
+        <button class="btn btn-primary btn-block" id="btnSearch" type="button">Show current prices</button>
+        <p class="hint" id="searchHint"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 3 - OFFERS ============ -->
+  <section class="view" id="view-3">
+    <div class="wrap">
+      <button class="back" type="button" data-go="2">&#8249; Change dates</button>
+      <div class="offers-head">
+        <h2 class="panel-title" id="offersTitle">Offers</h2>
+        <p class="panel-sub" id="offersSub"></p>
+      </div>
+      <div id="offersWrap" class="offers"></div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 4 - CHECKOUT ============ -->
+  <section class="view" id="view-4">
+    <div class="wrap narrow">
+      <button class="back" type="button" data-go="3">&#8249; Back to offers</button>
+
+      <div class="panel">
+        <h2 class="panel-title">Checkout</h2>
+        <p class="panel-sub">We'll put together your personal offer and get back to you within 10 to 30 minutes.</p>
+
+        <div class="recap" id="recap"></div>
+
+        <form id="inqForm" autocomplete="on" novalidate>
+          <input type="hidden" name="hotel_oid" id="iqOid">
+          <input type="hidden" name="travel_date" id="iqDate">
+          <input type="hidden" name="nights" id="iqNights">
+          <input type="hidden" name="rounds" id="iqRounds">
+          <input type="hidden" name="source" id="iqSource">
+          <input type="hidden" name="price" id="iqPrice">
+
+          <div class="form-grid two">
+            <label class="field">
+              <span class="field-label">Full name *</span>
+              <input class="input" type="text" name="full_name" required placeholder="John Smith">
+            </label>
+            <label class="field">
+              <span class="field-label">Phone *</span>
+              <input class="input" type="tel" name="phone" required placeholder="+44 …">
+            </label>
+            <label class="field field-wide">
+              <span class="field-label">Email *</span>
+              <input class="input" type="email" name="email" required placeholder="name@email.com">
+            </label>
+          </div>
+
+          <div class="counters">
+            <div class="counter">
+              <div class="counter-info"><span class="counter-name">Golfers</span><span class="counter-hint">playing on the course</span></div>
+              <div class="counter-ctl">
+                <button type="button" class="cstep" data-c="golfers" data-d="-1">&minus;</button>
+                <span class="cval" id="cGolfers">2</span>
+                <button type="button" class="cstep" data-c="golfers" data-d="1">+</button>
+              </div>
+            </div>
+            <div class="counter">
+              <div class="counter-info"><span class="counter-name">Additional guests</span><span class="counter-hint">travelling along, not playing</span></div>
+              <div class="counter-ctl">
+                <button type="button" class="cstep" data-c="non_golfers" data-d="-1">&minus;</button>
+                <span class="cval" id="cNonGolfers">0</span>
+                <button type="button" class="cstep" data-c="non_golfers" data-d="1">+</button>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" name="golfers" id="iqGolfers" value="2">
+          <input type="hidden" name="non_golfers" id="iqNonGolfers" value="0">
+
+          <label class="check check-feature">
+            <input type="checkbox" name="club_hire" id="iqClub">
+            <span class="check-box" aria-hidden="true"></span>
+            <span class="check-text">
+              <b>Golf club hire</b>
+              <small>Premium rental set, approx. €79 per person per week</small>
+            </span>
+          </label>
+
+          <div class="extra-block">
+            <p class="extra-title">Additional green fees on other courses <span>(optional)</span></p>
+            <div class="extra-grid" id="extraGrid"></div>
+          </div>
+
+          <label class="field">
+            <span class="field-label">Message (optional)</span>
+            <textarea class="input" name="note" rows="3" placeholder="Wishes, room category, arrival airport for the transfer …"></textarea>
+          </label>
+
+          <button class="btn btn-primary btn-block" id="btnSend" type="submit">Send my request</button>
+          <p class="hint" id="inqHint"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 5 - CONFIRMATION ============ -->
+  <section class="view" id="view-5">
+    <div class="wrap narrow">
+      <div class="panel confirm">
+        <div class="confirm-seal">&#10003;</div>
+        <h2 class="confirm-title">Request received.</h2>
+        <p class="confirm-lead">Thanks! We've got your price request and we're putting together a personal offer for you right now.</p>
+        <p class="confirm-eta">You'll get your reply within the next <b>10 to 30 minutes</b>.</p>
+        <div class="confirm-recap" id="confirmRecap"></div>
+        <button class="btn btn-ghost" type="button" data-go="1">View another resort</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span>Belek Golf Collection</span>
+    <span class="foot-dot">·</span>
+    <span>Live prices from leading golf tour operators</span>
+    <span class="foot-dot">·</span>
+    <span>Airport transfer included in the package price</span>
+  </div>
+</footer>
+
+<script>
+  window.__HOTELS__ = {{ hotels_json | safe }};
+  window.__COURSES__ = {{ courses_json | safe }};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="/static/app.js?v={{ asset_v }}" defer></script>
+</body>
+</html>
